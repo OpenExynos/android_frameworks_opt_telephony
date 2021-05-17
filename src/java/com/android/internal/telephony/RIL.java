@@ -77,6 +77,7 @@ import com.android.internal.telephony.dataconnection.DataProfile;
 import com.android.internal.telephony.RadioCapability;
 import com.android.internal.telephony.TelephonyDevController;
 import com.android.internal.telephony.HardwareConfig;
+import com.android.internal.telephony.CallDetails;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -949,6 +950,10 @@ public final class RIL extends BaseCommands implements CommandsInterface {
         rr.mParcel.writeString(address);
         rr.mParcel.writeInt(clirMode);
 
+        rr.mParcel.writeInt(CallDetails.CALL_TYPE_VOICE);
+        rr.mParcel.writeInt(CallDetails.CALL_DOMAIN_CS);
+        rr.mParcel.writeString("");
+
         if (uusInfo == null) {
             rr.mParcel.writeInt(0); // UUS information is absent
         } else {
@@ -1108,6 +1113,9 @@ public final class RIL extends BaseCommands implements CommandsInterface {
                 = RILRequest.obtain(RIL_REQUEST_ANSWER, result);
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest));
+
+        rr.mParcel.writeInt(1);
+        rr.mParcel.writeInt(CallDetails.CALL_TYPE_VOICE);
 
         send(rr);
     }
@@ -1792,6 +1800,9 @@ public final class RIL extends BaseCommands implements CommandsInterface {
         rr.mParcel.writeInt(PhoneNumberUtils.toaFromString(number));
         rr.mParcel.writeString(number);
         rr.mParcel.writeInt (timeSeconds);
+
+        rr.mParcel.writeString(null);
+        rr.mParcel.writeString(null);
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest)
                     + " " + action + " " + cfReason + " " + serviceClass
@@ -3518,6 +3529,21 @@ public final class RIL extends BaseCommands implements CommandsInterface {
             dc.als = p.readInt();
             voiceSettings = p.readInt();
             dc.isVoice = (0 == voiceSettings) ? false : true;
+
+            int type, domain;
+            String extras;
+
+            type = p.readInt();
+            domain = p.readInt();
+            extras = p.readString();
+
+            if (RILJ_LOGV) {
+                riljLog("responseCallList: type " + type + " domain " + domain + " extras " + extras);
+            }
+
+            //dc.callDetails = new CallDetails(type, domain, null);
+            //dc.callDetails.setExtrasFromCsv(extras);
+
             dc.isVoicePrivacy = (0 != p.readInt());
             dc.number = p.readString();
             int np = p.readInt();

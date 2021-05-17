@@ -1548,33 +1548,7 @@ public abstract class PhoneBase extends Handler implements Phone {
      */
     @Override
     public void setPreferredNetworkType(int networkType, Message response) {
-        // Only set preferred network types to that which the modem supports
-        int modemRaf = getRadioAccessFamily();
-        int rafFromType = RadioAccessFamily.getRafFromNetworkType(networkType);
-
-        if (modemRaf == RadioAccessFamily.RAF_UNKNOWN
-                || rafFromType == RadioAccessFamily.RAF_UNKNOWN) {
-            Rlog.d(LOG_TAG, "setPreferredNetworkType: Abort, unknown RAF: "
-                    + modemRaf + " " + rafFromType);
-            if (response != null) {
-                CommandException ex;
-
-                ex = new CommandException(CommandException.Error.GENERIC_FAILURE);
-                AsyncResult.forMessage(response, null, ex);
-                response.sendToTarget();
-            }
-            return;
-        }
-
-        int filteredRaf = (rafFromType & modemRaf);
-        int filteredType = RadioAccessFamily.getNetworkTypeFromRaf(filteredRaf);
-
-        Rlog.d(LOG_TAG, "setPreferredNetworkType: networkType = " + networkType
-                + " modemRaf = " + modemRaf
-                + " rafFromType = " + rafFromType
-                + " filteredType = " + filteredType);
-
-        mCi.setPreferredNetworkType(filteredType, response);
+        mCi.setPreferredNetworkType(networkType, response);
     }
 
     @Override

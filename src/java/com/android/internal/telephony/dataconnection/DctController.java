@@ -392,11 +392,13 @@ public class DctController extends Handler {
                 + ", activePhoneId=" + activePhoneId);
 
         if (requestedPhoneId == INVALID_PHONE_INDEX) {
+            logd("DEV_ONLY:requestedPhoneId == INVALID_PHONE_INDEX");
             // either we have no network request
             // or there is no valid subscription at the moment
             if (activePhoneId != INVALID_PHONE_INDEX) {
+                logd("DEV_ONLY:activePhoneId != INVALID_PHONE_INDEX - skip disconnect");
                 // detatch so we can try connecting later
-                mDcSwitchAsyncChannel[activePhoneId].disconnectAll();
+                //mDcSwitchAsyncChannel[activePhoneId].disconnectAll();
             }
             return;
         }
